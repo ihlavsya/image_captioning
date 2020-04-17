@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "/Applications/anaconda3/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--generated-members=numpy.* ,torch.* ,cv2.* , cv.*"
+        ],
+    "python.formatting.provider": "autopep8",
+}

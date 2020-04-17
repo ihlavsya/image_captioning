@@ -130,3 +130,6 @@ dmypy.json
 
 # custom ignores
 dataset
+models_weights
+dataset1
+
