@@ -132,4 +132,6 @@ dmypy.json
 dataset
 models_weights
 dataset1
+dataset2
+demo.py
 

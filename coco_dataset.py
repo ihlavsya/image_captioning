@@ -23,21 +23,20 @@ class CocoDataset(data_utils.Dataset):
         """
         self.root = root
         self.coco = COCO(json)
-        self.ids = list(self.coco.anns.keys())
+        self.ids = self.coco.getAnnIds()
         self.wv = copy.deepcopy(wv)
         self.transform = transform
 
     def __getitem__(self, index):
         """Returns one data pair (image and caption)."""
-        coco = self.coco
         # after simple try to add new tokens to vocabulary
         vocab = self.wv.vocab
         ann_id = self.ids[index]
-        caption = coco.anns[ann_id]["caption"]
-        img_id = coco.anns[ann_id]["image_id"]
-        path = coco.loadImgs(img_id)[0]["file_name"]
+        caption = self.coco.anns[ann_id]["caption"]
+        img_id = self.coco.anns[ann_id]["image_id"]
+        path = self.coco.loadImgs(img_id)[0]["file_name"]
 
-        image = Image.open(os.path.join(self.root, path)).convert("RGB")
+        # image = Image.open(os.path.join(self.root, path)).convert("RGB")
         if self.transform is not None:
             image = self.transform(image)
 
@@ -84,6 +83,6 @@ def collate_fn(data):
 
     for i, cap in enumerate(captions):
         end = lengths[i]
-        # you can also write just cap instead of cap[:end]
-        targets[i, :end] = torch.tensor(cap[:end])
+        targets[i, :end] = cap[:end].clone().detach()
+
     return images, targets, lengths

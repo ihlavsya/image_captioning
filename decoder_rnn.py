@@ -1,18 +1,27 @@
-"""LSTM model, that takes as input features and classifies word on each time-step"""
+"""LSTM model, that takes as input
+features and classifies word on each time-step"""
 import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence
 
+
 class DecoderRNN(nn.Module):
-    """LSTM model, that takes as input features and classifies word on each time-step"""
-    def __init__(self, embed_size, pretrained_weights, hidden_size, vocab_size, num_layers):
+    """LSTM model, that takes as input
+    features and classifies word on each time-step"""
+
+    def __init__(self, wv_wrapper, embed_size):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
+        wv = wv_wrapper["wv"]
+        vocab_size = len(wv.vectors)
+        num_layers = wv_wrapper["num_layers"]
+        hidden_size = embed_size
+
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers,
                             batch_first=True, dropout=0.2)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.init_weights(pretrained_weights)
+        self.init_weights(wv.vectors)
 
     def init_weights(self, pretrained_weights):
         """Initialize weights."""
@@ -22,7 +31,6 @@ class DecoderRNN(nn.Module):
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
-        # it should not be already captions just ids batch_size x num_layers
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
